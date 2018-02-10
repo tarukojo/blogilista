@@ -43,10 +43,41 @@ const mostBlogs = (blogs) => {
     })
 
     return finalResult
-}   
+} 
+
+const mostLikes = (blogs) => {
+    var results = []
+
+    blogs.map(function(blog) {
+
+        var writerResults = results.filter(function(result) {
+            if (result.author === blog.author) {
+                result.likes = result.likes + blog.likes
+                return result
+            }
+        }) 
+        if (writerResults.length === 0) {
+            results.push({ author: blog.author, likes: blog.likes})
+        } 
+    })
+
+    finalResult = { author: "", likes: 0 }
+
+    results.map(function(result) {
+        if (result.likes > finalResult.likes) {
+            finalResult = {
+                author: result.author,
+                likes: result.likes
+            }
+        } 
+    })
+
+    return finalResult
+} 
   
 module.exports = {
     dummy, 
     totalLikes,
-    mostBlogs
+    mostBlogs,
+    mostLikes
 }
