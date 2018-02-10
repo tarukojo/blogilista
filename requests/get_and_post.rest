@@ -1,0 +1,13 @@
+GET http://localhost:3003/api/blogs
+
+###
+
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+    "title": "Blogin title",
+    "author": "Kuka Kumma",
+    "url": "http://blogspot.fi/blogi",
+    "likes": 12
+}
