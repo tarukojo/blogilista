@@ -11,3 +11,14 @@ Content-Type: application/json
     "url": "http://blogspot.fi/blogi",
     "likes": 12
 }
+
+###
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+    "title": "Blogin 3 title",
+    "author": "Kuka Kumma 3",
+    "url": "http://blogspot.fi/blogi3",
+    "likes": 1
+}
