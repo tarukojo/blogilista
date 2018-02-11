@@ -41,7 +41,7 @@ const initialBlogs = [
     title: "TDD harms architecture",
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
-    likes: 0,
+    likes: 1,
     __v: 0
     },
     {
@@ -124,7 +124,32 @@ test('a valid blog can be added ', async () => {
 
 test('blog without title is not added ', async () => {
     const newBlog = {
-      author: "Testi Bloggaaja"
+      author: "Testi Bloggaaja",
+      url: "http://www.test.fi",
+      likes: 1
+    }
+  
+    const intialBlogs = await api
+      .get('/api/blogs')
+  
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+  
+    const response = await api
+      .get('/api/blogs')
+  
+    const titles = response.body.map(r => r.title)
+  
+    expect(response.body.length).toBe(intialBlogs.body.length)
+})
+
+test('blog without url is not added ', async () => {
+    const newBlog = {
+      title: "New Blog title",
+      author: "Testi Bloggaaja",
+      likes: 10
     }
   
     const intialBlogs = await api
