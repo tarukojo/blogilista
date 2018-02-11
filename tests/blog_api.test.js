@@ -140,6 +140,54 @@ describe('blogs are added ok', () => {
         expect(blogsAfter.length).toBe(blogsBefore.length + 1)
         expect(likes).toContain(0)
     })
+
+    test('blog without title is not added ', async () => {
+        const newBlog = {
+        author: "Testi Bloggaaja",
+        url: "http://www.test.fi",
+        likes: 1
+        }
+    
+        const intialBlogs = await api
+        .get('/api/blogs')
+    
+        await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+    
+        const response = await api
+        .get('/api/blogs')
+    
+        const titles = response.body.map(r => r.title)
+    
+        expect(response.body.length).toBe(intialBlogs.body.length)
+    })
+
+    test('blog without url is not added ', async () => {
+        const newBlog = {
+        title: "New Blog title",
+        author: "Testi Bloggaaja",
+        likes: 10
+        }
+    
+        const intialBlogs = await api
+        .get('/api/blogs')
+    
+        await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+    
+        const response = await api
+        .get('/api/blogs')
+    
+        const titles = response.body.map(r => r.title)
+    
+        expect(response.body.length).toBe(intialBlogs.body.length)
+
+    })
+
 })
 
 describe('blogs are deleted ok', () => {
