@@ -143,6 +143,31 @@ test('blog without title is not added ', async () => {
     expect(response.body.length).toBe(intialBlogs.body.length)
 })
 
+test('blog without likes is added with zero likes ', async () => {
+    const newBlog = {
+      title: "Zero likes blog",
+      author: "Testi Bloggaaja",
+      url: "http://www.bloggers.com/bloglikes"
+    }
+  
+    const intialBlogs = await api
+      .get('/api/blogs')
+  
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  
+    const response = await api
+      .get('/api/blogs')
+  
+    const likes = response.body.map(r => r.likes)
+  
+    expect(response.body.length).toBe(intialBlogs.body.length + 1)
+    expect(likes).toContain(0)
+})
+
 afterAll(() => {
   server.close()
 })
