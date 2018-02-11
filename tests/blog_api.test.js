@@ -142,6 +142,26 @@ describe('blogs are added ok', () => {
     })
 })
 
+describe('blogs are deleted ok', () => {
+    test('first blog is deleted ok', async () => {
+
+        const blogsBefore = await blogsInDb()
+
+        const blogToDelete = blogsBefore[0]
+        
+        await api
+        .delete('/api/blogs/'+ blogToDelete.id)
+        .expect(204)
+    
+        const blogsAfter = await blogsInDb()
+    
+        const titles = blogsAfter.map(r => r.titles)
+    
+        expect(blogsAfter.length).toBe(blogsBefore.length - 1)
+        expect(titles).not.toContain(blogToDelete.title)
+    })
+})
+
 afterAll(() => {
   server.close()
 })

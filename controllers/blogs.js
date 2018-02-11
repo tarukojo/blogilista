@@ -6,7 +6,8 @@ const formatBlog = (blog) => {
     title: blog.title,
     author: blog.author,
     url: blog.url,
-    likes: blog.likes
+    likes: blog.likes,
+    id: blog._id
   }
 }
 
@@ -32,6 +33,19 @@ blogsRouter.post('/', async (request, response) => {
   
     const savedBlog = await blog.save()
     response.json(formatBlog(savedBlog))
+  } catch (exception) {
+    console.log(exception)
+    response.status(500).json({ error: 'something went wrong...' })
+  }
+})
+
+blogsRouter.delete('/:id', async (request, response) => {
+  try {
+     const reqid = request.params.id
+
+     const blog = await Blog.findByIdAndRemove({ _id: reqid })
+     response.status(204).end()
+
   } catch (exception) {
     console.log(exception)
     response.status(500).json({ error: 'something went wrong...' })
