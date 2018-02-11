@@ -1,4 +1,4 @@
-describe('most blogs', () => {
+describe.skip('most blogs', () => {
 
     const mostBlogs = require('../utils/list_helper').mostBlogs
 

@@ -1,4 +1,4 @@
-describe('most likes', () => {
+describe.skip('most likes', () => {
 
     const mostLikes = require('../utils/list_helper').mostLikes
 
