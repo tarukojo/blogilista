@@ -1,0 +1,13 @@
+GET http://localhost:3001/api/blogs
+
+###
+
+PUT http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+    "title": "New Blog here",
+    "author": "Liisa Laatikko",
+    "url": "http://www.google.fi",
+    "likes": 22
+}

@@ -52,4 +52,19 @@ blogsRouter.delete('/:id', async (request, response) => {
   }
 })
 
+blogsRouter.put('/:id', async (request, response) => {
+  try {
+     const reqid = request.params.id
+     const blogToUpdate = request.body
+
+     const updatedBlog = await Blog.findByIdAndUpdate({ _id: reqid }, blogToUpdate, {upsert:false, new: true})
+     response.json(formatBlog(updatedBlog))
+
+  } catch (exception) {
+    console.log(exception)
+    response.status(500).json({ error: 'something went wrong...' })
+  }
+})
+
+
 module.exports = blogsRouter

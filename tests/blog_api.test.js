@@ -162,6 +162,37 @@ describe('blogs are deleted ok', () => {
     })
 })
 
+describe('blogs are updated ok', () => {
+    test('one blog is updated ok', async () => {
+
+        const blogsBefore = await blogsInDb()
+
+        const blogToUpdate = blogsBefore[0]
+        blogToUpdate.title = "!!! Uusi !!!"
+        blogToUpdate.likes = 21
+        const idOfBlog = blogToUpdate.id
+
+        await api
+        .put('/api/blogs/'+ blogToUpdate.id)
+        .send(blogToUpdate)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+    
+        const blogsAfter = await blogsInDb()
+    
+        const blogAfterUpdate = blogsAfter.map(r => {
+            if (r.title === blogToUpdate.title) {
+                return r
+            }
+        })
+
+        expect(blogsAfter.length).toBe(blogsBefore.length)
+        expect(blogAfterUpdate[0].title).toBe("!!! Uusi !!!")
+        expect(blogAfterUpdate[0].likes).toBe(21)
+    })
+})
+
+
 afterAll(() => {
   server.close()
 })

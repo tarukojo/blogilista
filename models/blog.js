@@ -5,7 +5,7 @@ const Blog = mongoose.model('Blog', {
     author: String,
     url: String,
     likes: Number,
-    id: Number
+    id: String
   })
   
 module.exports = Blog
