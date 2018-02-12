@@ -1,0 +1,25 @@
+GET http://localhost:3001/api/users
+
+###
+
+POST http://localhost:3001/api/users/
+Content-Type: application/json
+
+{
+  "username": "foobar",
+  "name": "Maija Mallikas",
+  "password": "password",
+  "adult": "true"
+}
+
+###
+
+POST http://localhost:3001/api/users/
+Content-Type: application/json
+
+{
+  "username": "barfoo",
+  "name": "Matti Möttönen",
+  "password": "salainen",
+  "adult": "false"
+}
