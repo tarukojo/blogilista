@@ -4,15 +4,6 @@ const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 
-/*
-const getTokenFrom = (request) => {
-    const authorization = request.get('authorization')
-    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-        return authorization.substring(7)
-    }
-    return null
-}
-*/
 
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
@@ -23,11 +14,14 @@ blogsRouter.post('/', async (request, response) => {
     try {
         const body = request.body
   
-        //const token = getTokenFrom(request)
+        if (!request.token) {
+            return response.status(401).json({ error: 'token missing'})
+        }
+
         const decodedToken = jwt.verify(request.token, process.env.SECRET)
     
-        if (!request.token || !decodedToken.id) {
-            return response.status(401).json({ error: 'token missing or invalid' })
+        if (!decodedToken.id) {
+            return response.status(401).json({ error: 'token invalid' })
         }
 
         if (body.title === undefined || body.url === undefined) {
@@ -70,14 +64,35 @@ blogsRouter.post('/', async (request, response) => {
 
 blogsRouter.delete('/:id', async (request, response) => {
     try {
+        if (!request.token) {
+            return response.status(401).json({ error: 'token missing'})
+        }
+
+        const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    
+        if (!decodedToken.id) {
+            return response.status(401).json({ error: 'token invalid' })
+        }
+
         const reqid = request.params.id
+
+        const blogToDelete = await Blog.findById({ _id: reqid })
+        const user = await User.findById(decodedToken.id)
+
+        if (blogToDelete.user.toString() !== user.id.toString()) {
+            response.status(401).json({ error: 'Unauthorized' })
+        }
 
         await Blog.findByIdAndRemove({ _id: reqid })
         response.status(204).end()
 
     } catch (exception) {
-        console.log(exception)
-        response.status(500).json({ error: 'something went wrong...' })
+        if (exception.name === 'JsonWebTokenError' ) {
+            response.status(401).json({ error: exception.message })
+        } else {
+            console.log(exception)
+            response.status(500).json({ error: 'something went wrong...' })
+        }    
     }
 })
 
