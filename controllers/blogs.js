@@ -1,7 +1,16 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose')
 
+const getTokenFrom = (request) => {
+    const authorization = request.get('authorization')
+    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+        return authorization.substring(7)
+    }
+    return null
+}
 
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
@@ -12,18 +21,27 @@ blogsRouter.post('/', async (request, response) => {
     try {
         const body = request.body
   
+        const token = getTokenFrom(request)
+        const decodedToken = jwt.verify(token, process.env.SECRET)
+    
+        if (!token || !decodedToken.id) {
+            return response.status(401).json({ error: 'token missing or invalid' })
+        }
+
         if (body.title === undefined || body.url === undefined) {
             return response.status(400).json({ error: 'title missing' })
         }
         // to be added later from token
         //const user = await User.findById(body.userId)
-        const users = await User.find({})
-          
-        if (users.length === 0) {
-            return response.status(400).json({ error: 'cannot add blog without user'})
-        } 
+        //const users = await User.find({})
+         
+        const user = await User.findById(decodedToken.id)
 
-        const user = users.pop()
+        //if (users.length === 0) {
+        //    return response.status(400).json({ error: 'cannot add blog without user'})
+        //} 
+
+        //const user = users.pop()
 
         const blog = new Blog({
             title: body.title,
@@ -34,19 +52,26 @@ blogsRouter.post('/', async (request, response) => {
         })
 
         const savedBlog = await blog.save()
-
-        if (user.blogs === undefined || user.blogs.length === 0) {
-            user.blogs = new Array(savedBlog.id) 
+        
+        if (Array.isArray(user.blogs)) {
+            user.blogs.push(savedBlog._id)
         } else {
-            user.blogs = user.blogs.concat(savedBlog.id)
+            var newUserBlogs = []
+            newUserBlogs.push(user.blogs)            
+            newUserBlogs.push(savedBlog._id)
+            user.blogs = newUserBlogs          
         }
 
         await user.save()
 
         response.json(Blog.format(savedBlog))
     } catch (exception) {
-        console.log(exception)
-        response.status(500).json({ error: 'something went wrong...' })
+        if (exception.name === 'JsonWebTokenError' ) {
+            response.status(401).json({ error: exception.message })
+        } else {
+            console.log(exception)
+            response.status(500).json({ error: 'something went wrong...' })
+        }
     }
 })
 
