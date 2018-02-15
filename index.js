@@ -15,13 +15,36 @@ mongoose.Promise = global.Promise
 const Blog = require('./models/blog')
 const User = require('./models/user')
 
+const tokenExtractor = (request, response, next) => {
+    const authorization = request.get('authorization')
+    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+        request.token = authorization.substring(7)
+    } else {
+        request.token = ""
+    }
+    next()
+}
+
+const logger = (request, response, next) => {
+    console.log('Method:',request.method)
+    console.log('Path:  ', request.path)
+    console.log('Body:  ', request.body)
+    console.log('---')
+    next()
+}
+
+
 app.use(express.static('build'))
 app.use(cors())
 app.use(bodyParser.json())
 
+app.use(tokenExtractor)
+app.use(logger)
+
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
+
 
 const server = http.createServer(app)
 
