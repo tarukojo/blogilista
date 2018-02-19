@@ -48,8 +48,9 @@ app.use('/api/login', loginRouter)
 
 const server = http.createServer(app)
 
+const PORT = config.post || 3003
 server.listen(config.port, () => {
-  console.log(`Server running on port ${config.port}`)
+  console.log(`Server running on port ${PORT}`)
 })
 
 server.on('close', () => {
